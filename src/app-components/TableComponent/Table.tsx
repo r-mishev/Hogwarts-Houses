@@ -15,6 +15,7 @@ import { TableHeader } from "../TableHeader/TableHeader";
 
 export const Table = () => {
   const [columns, setColumns] = useState([]);
+  const [houses, setHouses] = useState<HouseDto[]>([]);
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState<
     { id: string; value: string }[]
@@ -51,6 +52,7 @@ export const Table = () => {
             }));
 
           setColumns(updatedColumns);
+          setHouses(data);
         }
       },
     }
@@ -58,7 +60,7 @@ export const Table = () => {
 
   const table = useReactTable({
     columns,
-    data,
+    data: houses,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -70,7 +72,16 @@ export const Table = () => {
     onColumnFiltersChange: setColumnFilters,
   });
 
-  const uniqueAnimals = [...new Set(data?.map((house) => house.animal))];
+  const uniqueAnimals = [
+    "Lion",
+    "Eagle",
+    "Badger",
+    "Serpent",
+    "Dolphin",
+    "Giraffe",
+    "Armadillo",
+    "Unicorn",
+  ];
 
   if (isLoading) {
     return <p> Loading... </p>;
@@ -81,6 +92,7 @@ export const Table = () => {
       <TableHeader
         uniqueAnimals={uniqueAnimals}
         setColumnFilters={setColumnFilters}
+        setHouses={setHouses}
       />
       <table className="table">
         <thead>

@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const animalOptions = ["Giraffe", "Dolphin", "Armadillo", "Unicorn"];
 
-export const CreateHouseModal = ({ showModal, handleClose }) => {
+export const CreateHouseModal = ({ showModal, handleClose, setHouses }) => {
   const [formData, setFormData] = useState({
     name: "",
     animal: "",
@@ -46,7 +46,7 @@ export const CreateHouseModal = ({ showModal, handleClose }) => {
     return isValid;
   };
 
-  const handleSubmit = (event) => {
+  function handleSubmit(event) {
     event.preventDefault();
 
     if (validateForm()) {
@@ -57,9 +57,10 @@ export const CreateHouseModal = ({ showModal, handleClose }) => {
         ghost: formData.ghost,
         commonRoom: formData.commonRoom,
       };
+      setHouses((prevHouses) => [...prevHouses, newHouse]);
       handleClose();
     }
-  };
+  }
 
   return (
     <div className={`modal ${showModal ? "show" : ""}`}>
