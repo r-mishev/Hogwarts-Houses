@@ -55,7 +55,7 @@ export const Table = () => {
   const { globalFilter } = state;
 
   return (
-    <>
+    <div className="table_container">
       <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
       <table className="table" {...getTableProps()}>
         <thead>
@@ -90,6 +90,6 @@ export const Table = () => {
           })}
         </tbody>
       </table>
-    </>
+    </div>
   );
 };
