@@ -22,7 +22,7 @@ type TraitDto = {
   name: TraitName;
 };
 
-enum TraitName {
+export enum TraitName {
   NONE = "None",
   COURAGE = "Courage",
   BRAVERY = "Bravery",
@@ -49,4 +49,9 @@ enum TraitName {
   SELFPRESERVATION = "Selfpreservation",
 }
 
-export type { HouseDto, HouseHeadDto, TraitDto, TraitName };
+type ColumnsData = {
+  label: string;
+  accessor: string;
+};
+
+export type { HouseDto, HouseHeadDto, TraitDto, ColumnsData };

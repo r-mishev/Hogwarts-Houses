@@ -1,0 +1,43 @@
+.table_container {
+  max-width: fit-content;
+  margin: 0 auto;
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-spacing: 0;
+
+  th {
+    background: #fff;
+    padding: 8px 10px;
+    border-bottom: 1px solid #1a1a1a;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  td {
+    border-top: 1px solid #ddd;
+    padding: 8px 20px;
+  }
+
+  tbody {
+    tr:first-child {
+      td {
+        border-top: none;
+      }
+    }
+
+    tr:nth-child(n) {
+      td {
+        background: #eff0f0;
+      }
+    }
+
+    tr:nth-child(2n) {
+      td {
+        background: #fff;
+      }
+    }
+  }
+}
