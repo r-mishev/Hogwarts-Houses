@@ -12,16 +12,18 @@ export const ContactPage = () => {
       can. Webp images are smaller and faster to load than jpgs, however some
       browsers (IE, Safari) do not support webp images. The picture tag allows
       us to render a jpg if the browser does not support webp. */}
-      <picture>
-        <source
-          srcSet="/src/app-assets/webp/Corneliushogwarts.webp"
-          type="image/webp"
-        />
-        <img
-          src="/src/app-assets/jpg/Corneliushogwarts.jpg"
-          alt="Cornelius Fudge"
-        />
-      </picture>
+      <div className="picture-container">
+        <picture>
+          <source
+            srcSet="/src/app-assets/webp/Corneliushogwarts.webp"
+            type="image/webp"
+          />
+          <img
+            src="/src/app-assets/jpg/Corneliushogwarts.jpg"
+            alt="Cornelius Fudge"
+          />
+        </picture>
+      </div>
     </>
   );
 };
