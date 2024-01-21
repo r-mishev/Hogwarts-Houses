@@ -3,7 +3,6 @@ import { ColumnsData, HouseDto } from "../../app-common/types";
 import { fetchHouses } from "../../app-utils/queries";
 import { useState } from "react";
 import {
-  Column,
   useReactTable,
   getSortedRowModel,
   getFilteredRowModel,
@@ -12,7 +11,7 @@ import {
 } from "@tanstack/react-table";
 import { camelCaseToTitle } from "./utils";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { Filters } from "../Filter/Filters";
+import { TableHeader } from "../TableHeader/TableHeader";
 
 export const Table = () => {
   const [columns, setColumns] = useState([]);
@@ -39,7 +38,6 @@ export const Table = () => {
                 filterFn:
                   key === "animal"
                     ? (row, columnId, filterValue) => {
-                        console.log("HERE");
                         if (filterValue.length === 0) return true;
                         const value = row.getValue(columnId);
                         return filterValue.includes(value);
@@ -78,11 +76,12 @@ export const Table = () => {
     return <p> Loading... </p>;
   }
 
-  console.log(columnFilters);
-
   return (
     <div className="table_container">
-      <Filters animals={uniqueAnimals} onFilterSelected={setColumnFilters} />
+      <TableHeader
+        uniqueAnimals={uniqueAnimals}
+        setColumnFilters={setColumnFilters}
+      />
       <table className="table">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
