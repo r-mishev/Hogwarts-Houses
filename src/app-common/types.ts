@@ -50,8 +50,8 @@ export enum TraitName {
 }
 
 type ColumnsData = {
-  Header: string;
-  accessor: string;
+  header: string;
+  accessorKey: string;
 };
 
 export type { HouseDto, HouseHeadDto, TraitDto, ColumnsData };

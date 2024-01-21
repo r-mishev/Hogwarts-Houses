@@ -2,13 +2,24 @@ import { useQuery } from "react-query";
 import { ColumnsData, HouseDto } from "../../app-common/types";
 import { fetchHouses } from "../../app-utils/queries";
 import { useState } from "react";
-import { Column, useTable, useSortBy, useGlobalFilter } from "react-table";
-import { camelCaseToTitle, renderArrayData } from "./utils";
+import {
+  Column,
+  useReactTable,
+  getSortedRowModel,
+  getFilteredRowModel,
+  flexRender,
+  getCoreRowModel,
+} from "@tanstack/react-table";
+import { camelCaseToTitle } from "./utils";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { GlobalFilter } from "./GlobalFilter";
+import { Filters } from "../Filter/Filters";
 
 export const Table = () => {
-  const [columns, setColumns] = useState<readonly Column<ColumnsData>[]>([]);
+  const [columns, setColumns] = useState([]);
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState<
+    { id: string; value: string }[]
+  >([]);
   const { data, isLoading } = useQuery<HouseDto[], Error>(
     "houses",
     fetchHouses,
@@ -16,78 +27,102 @@ export const Table = () => {
       onError: (error) => <>Error: {error}</>,
       onSuccess: (data) => {
         if (data && data.length > 0) {
-          const rawColumns = Object.keys(data[0])
-            .slice(1)
-            .map((key) => ({
-              Header: key,
-              accessor: key as keyof ColumnsData,
+          const columnsToInclude = ["name", "animal", "ghost", "commonRoom"];
+
+          const updatedColumns = columnsToInclude
+            .map((key) => {
+              return {
+                id: key,
+                header: key,
+                accessorKey: key as keyof ColumnsData,
+                enableColumnFilter: key === "animal",
+                filterFn:
+                  key === "animal"
+                    ? (row, columnId, filterValue) => {
+                        console.log("HERE");
+                        if (filterValue.length === 0) return true;
+                        const value = row.getValue(columnId);
+                        return filterValue.includes(value);
+                      }
+                    : null,
+              };
+            })
+            .map((column) => ({
+              ...column,
+              header: camelCaseToTitle(column.header),
             }));
-          const updatedColumns = rawColumns.map((column) => ({
-            ...column,
-            Header: camelCaseToTitle(column.Header),
-          }));
+
           setColumns(updatedColumns);
         }
       },
     }
   );
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-    state,
-    setGlobalFilter,
-  } = useTable(
-    {
-      columns,
-      data,
+
+  const table = useReactTable({
+    columns,
+    data,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      columnFilters: columnFilters,
+      sorting: sorting,
     },
-    useGlobalFilter,
-    useSortBy
-  );
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+  });
+
+  const uniqueAnimals = [...new Set(data?.map((house) => house.animal))];
 
   if (isLoading) {
     return <p> Loading... </p>;
   }
 
-  const { globalFilter } = state;
+  console.log(columnFilters);
 
   return (
     <div className="table_container">
-      <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
-      <table className="table" {...getTableProps()}>
+      <Filters animals={uniqueAnimals} onFilterSelected={setColumnFilters} />
+      <table className="table">
         <thead>
-          {headerGroups.map((hg) => (
-            <tr {...hg.getHeaderGroupProps()}>
-              {hg.headers.map((column) => (
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                  {column.render("Header")}
-                  {column.isSorted &&
-                    (column.isSortedDesc ? (
-                      <IoIosArrowDown />
-                    ) : (
-                      <IoIosArrowUp />
-                    ))}
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th
+                  key={header.id}
+                  onClick={
+                    header.id === "name"
+                      ? header.column.getToggleSortingHandler("name")
+                      : () => {}
+                  }
+                  style={{ cursor: header.id === "name" ? "pointer" : "" }}
+                >
+                  <>
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                    {
+                      { asc: <IoIosArrowUp />, desc: <IoIosArrowDown /> }[
+                        (header.column.getIsSorted() as "asc" | "desc") ?? null
+                      ]
+                    }
+                  </>
                 </th>
               ))}
             </tr>
           ))}
         </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => {
-                  const accessor = cell.column.id as string;
-                  const updatedData = renderArrayData(accessor, cell.value);
-                  return <td {...cell.getCellProps()}>{updatedData}</td>;
-                })}
-              </tr>
-            );
-          })}
+        <tbody>
+          {table.getRowModel().rows.map((row) => (
+            <tr key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <td key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
