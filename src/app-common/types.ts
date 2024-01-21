@@ -50,7 +50,7 @@ export enum TraitName {
 }
 
 type ColumnsData = {
-  label: string;
+  Header: string;
   accessor: string;
 };
 
